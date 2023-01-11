@@ -1,7 +1,4 @@
-
-
-
-let words: string[] = [
+const words: string[] = [
     "CASA", "PERRO", "GATO", "COMPUTADORA", "ESCRITORIO", "SILLA", "LIBRO", "LAPIZ", "BOLIGRAFO", "CUADERNO",
     "TELEFONO", "CELULAR", "CAMARA", "FOTOGRAFIA", "LAPTOP", "ESCUELA", "COLEGIO", "UNIVERSIDAD", "PROFESOR", "ESTUDIANTE",
     "ESTABLECIMIENTO", "COMIDA", "BEBIDA", "RESTAURANTE", "BANCO", "DINERO", "AHORRO", "TARJETA", "CREDITO", "DEBITO",
@@ -16,9 +13,30 @@ let words: string[] = [
     "BANANA", "ROSADO", "ROSA",
 ];
 
-export function getRandomWord() {
+export class Word {
+    private word!: string;
 
-    const randomIndex = Math.floor(Math.random() * words.length);
+    // singleton
+    private static instance: Word; 
 
-    return words[randomIndex];
+    private constructor() {
+        this.word = this.getRandomWord();
+    }
+
+    static getInstance(reset = false): Word {
+        if (!Word.instance || reset) {
+            Word.instance = new Word();
+        }
+
+        return Word.instance;
+    }
+
+    private getRandomWord(): string {
+        const randomIndex = Math.floor(Math.random() * words.length);
+        return words[randomIndex];
+    }
+
+    public getWord(): string {
+        return this.word;
+    }
 }

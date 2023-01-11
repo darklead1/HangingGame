@@ -22,16 +22,13 @@ const images: string[] = [
     image7,
     image8,
     image9,
-
 ];
 
 interface Props {
     imageNumber: number;
-
 }
 
 export function HangImage({ imageNumber }: Props) {
-
     if (imageNumber >= 9) {
         imageNumber = 9;
     }

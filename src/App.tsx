@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { letters } from "./helpers/letters";
 import './App.css';
 import { HangImage } from "./components/HangImage";
-import { getRandomWord } from "./helpers/newRandomWord";
+import { Word } from "./helpers/newRandomWord";
+import { Hash } from "./helpers/hash";
 
 function App() {
 
-  const [word, setWord] = useState(getRandomWord);
-  const [hiddenWord, setHiddenWord] = useState("_ ".repeat(word.length));
+  const [word, setWord] = useState(Hash.encrypt(Word.getInstance().getWord()));
+  const [hiddenWord, setHiddenWord] = useState("_ ".repeat(Hash.decrypt(word).length));
 
+  const [alreadySelected, setAlreadySelected] = useState<string[]>([]);
   const [attempts, setAttempts] = useState(0);
   const [lose, setLose] = useState(false);
   const [won, setWon] = useState(false);
@@ -18,14 +20,13 @@ function App() {
     if (attempts >= 9) {
       setLose(true);
     }
-
   }, [attempts]);
 
 
   //determinar si la persona ganó 
   useEffect(() => {
     const currentHiddenWord = hiddenWord.split(" ").join("");
-    if (currentHiddenWord === word) {
+    if (Hash.decrypt(word).length === currentHiddenWord.length && currentHiddenWord === Hash.decrypt(word)) {
       setWon(true);
     }
 
@@ -33,44 +34,44 @@ function App() {
 
 
   const checkLetter = (letter: string) => {
+    const decryptedWord = Hash.decrypt(word);
+
     if (lose) return;
     if (won) return;
-    if (!word.includes(letter)) {
+
+    if (!Hash.decrypt(word).includes(letter)) {
       setAttempts(Math.min(attempts + 1, 9));
+      setAlreadySelected([...alreadySelected, letter]);
+
       return;
     }
 
     const hiddenWordArray = hiddenWord.split(" ");
 
-
-    for (let i = 0; i < word.length; i++) {
-      if (word[i] === letter) {
+    for (let i = 0; i < decryptedWord.length; i++) {
+      if (decryptedWord[i] === letter) {
+        setAlreadySelected([...alreadySelected, letter]);
+    
         hiddenWordArray[i] = letter;
       }
-
     }
-    setHiddenWord(hiddenWordArray.join(" "))
 
+    setHiddenWord(hiddenWordArray.join(" "))
   }
 
 
   const newGame = () => {
-    console.log(newGame)
-    const newWord = getRandomWord();
+    const newWord = Hash.encrypt(Word.getInstance(true).getWord());
 
     setWord(newWord);
-    setHiddenWord("_ ".repeat(newWord.length));
+    setHiddenWord("_ ".repeat(Hash.decrypt(newWord).length));
     setAttempts(0);
+    setAlreadySelected([]);
     setLose(false);
     setWon(false);
-
   }
 
-
-
-
   return (
-
     <div className="App">
 
       {/* Imágenes */}
@@ -93,31 +94,26 @@ function App() {
 
       {
         (won)
-          ? <h2>Ganaste 😎 {word}</h2>
+          ? <h2>Ganaste 😎 {Hash.decrypt(word)}</h2>
           : ""}
 
       {
-        (won && word === "ANA") ? <h2>   TE AMOOOOOOOO AMOR 😍❤️❤️❤️❤️❤️❤️</h2> : ""
+        (won && Hash.decrypt(word) === "ANA") ? <h2>   TE AMOOOOOOOO AMOR 😍❤️❤️❤️❤️❤️❤️</h2> : ""
 
       }
       {
-        (won && word === "MARTHYNA") ? <h2> Hola Hermanita 😽❤️</h2> : ""
-
+        (won && Hash.decrypt(word) === "MARTHYNA") ? <h2> Hola Hermanita 😽❤️</h2> : ""
       }
 
-
-
-
-
-
-
-
       {/* Botones de letras */}
-
 
       {
         letters.map((letter) => (
           <button
+            disabled={alreadySelected.includes(letter)}
+            style={{
+              borderColor: alreadySelected.includes(letter) ? "red" : "black",
+            }}
             onClick={() => checkLetter(letter)}
             key={letter}>
             {letter}
