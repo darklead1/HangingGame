@@ -51,7 +51,7 @@ function App() {
     for (let i = 0; i < decryptedWord.length; i++) {
       if (decryptedWord[i] === letter) {
         setAlreadySelected([...alreadySelected, letter]);
-    
+
         hiddenWordArray[i] = letter;
       }
     }
@@ -86,7 +86,7 @@ function App() {
       {/* Mensaje si perdió  */}
       {
         (lose)
-          ? <h2>Perdiste 😭 {word}</h2>
+          ? <h2>Perdiste 😭{Hash.decrypt(word)}</h2>
           : ""
 
       }
